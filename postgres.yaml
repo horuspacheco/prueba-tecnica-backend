@@ -1,0 +1,60 @@
+services:
+  postgres:
+    image : pgvector/pgvector:pg17
+    command: ["postgres", "-c", "listen_addresses=*"]
+    restart: always
+    environment:
+      - POSTGRES_PASSWORD=41f1c5c463940b8b39c916d844a378b5
+      - POSTGRES_DB=postgres
+    networks:
+      general_network:
+        ipv4_address: 172.18.0.6
+    volumes:
+      - postgres_vector_data:/var/lib/postgresql/data
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      resources:
+        limits:
+          cpus: "1"
+          memory: 2048M
+    ports:
+      - "5432:5432"
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    restart: always
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=horuspacheco@gmail.com
+      - PGADMIN_DEFAULT_PASSWORD=@LL291221h
+    networks:
+      general_network:
+        ipv4_address: 172.18.0.7
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      resources:
+        limits:
+          cpus: "1"
+          memory: 2048M
+    ports:
+      - "5050:80"
+
+volumes:
+  postgres_vector_data:
+    external: true
+  pgadmin_data:
+    external: false
+
+networks:
+  general_network:
+    external: true
+

@@ -1,44 +1,37 @@
 version: '3.8'
 services:
-  postgres:
-    image: postgres:15
-    ports:
-      - "5432:5432"
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: payments
-    volumes:
-      - pgdata:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
   payment-service:
     build: ./payment-service
     ports:
       - "3001:3001"
     environment:
-      DATABASE_URL: postgres://postgres:postgres@postgres:5432/payments
-    depends_on:
-      postgres:
-        condition: service_healthy
+      DATABASE_URL: "postgresql://postgres:41f1c5c463940b8b39c916d844a378b5@172.18.0.6:5432/postgres"
+    networks:
+      general_network:
+        ipv4_address: 172.18.0.8
+
   api-gateway:
     build: ./api-gateway
     ports:
       - "3000:3000"
     environment:
       PAYMENT_SERVICE_URL: http://payment-service:3001
-    depends_on:
-      - payment-service
+    networks:
+      general_network:
+        ipv4_address: 172.18.0.9
+
   notification-service:
     build: ./notification-service
     ports:
       - "3002:3002"
     environment:
-      DATABASE_URL: postgres://postgres:postgres@postgres:5432/payments
-    depends_on:
-      - postgres
-volumes:
-  pgdata:
+      DATABASE_URL: "postgresql://postgres:41f1c5c463940b8b39c916d844a378b5@172.18.0.6:5432/postgres"
+    networks:
+      general_network:
+        ipv4_address: 172.18.0.10
+
+networks:
+  general_network:
+    external: true
+
+
