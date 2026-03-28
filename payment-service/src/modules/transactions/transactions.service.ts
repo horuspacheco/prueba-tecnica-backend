@@ -4,6 +4,8 @@ import { CreateTransactionDto } from './dto/create-transaction.dto';
 import { UpdateStatusDto } from './dto/update-status.dto';
 import { v4 as uuidv4 } from 'uuid';
 
+const NOTIFICATION_URL = process.env.NOTIFICATION_SERVICE_URL || 'http://localhost:3002';
+
 const VALID_TRANSITIONS: Record<string, string[]> = {
   pending: ['approved', 'rejected', 'failed'],
   approved: ['completed', 'failed'],
@@ -93,6 +95,26 @@ export class TransactionsService {
       throw new UnprocessableEntityException(`Transicion de estado invalida: no se puede cambiar de '${tx.status}' a '${dto.status}'`);
     }
 
-    return this.prisma.transaction.update({ where: { id }, data: { status: dto.status } });
+    const updated = await this.prisma.transaction.update({ where: { id }, data: { status: dto.status } });
+
+    // emit notification to notification-service (best-effort)
+    try {
+      const event = {
+        transaction_id: updated.id,
+        merchant_id: updated.merchant_id,
+        event_type: `transaction.${updated.status}`,
+        payload: updated,
+      };
+      // node 18+ has global fetch
+      await fetch(`${NOTIFICATION_URL}/events`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(event),
+      });
+    } catch (err) {
+      console.warn('Failed to notify notification-service', err);
+    }
+
+    return updated;
   }
 }

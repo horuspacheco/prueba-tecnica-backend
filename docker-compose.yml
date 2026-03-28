@@ -6,6 +6,7 @@ services:
       - "3001:3001"
     environment:
       DATABASE_URL: "postgresql://postgres:41f1c5c463940b8b39c916d844a378b5@172.18.0.6:5432/postgres"
+      NOTIFICATION_SERVICE_URL: http://notification-service:3002
     networks:
       general_network:
         ipv4_address: 172.18.0.8

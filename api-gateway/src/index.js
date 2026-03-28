@@ -77,8 +77,10 @@ async function proxyToPaymentService(req, res) {
 	const url = `${target}${req.originalUrl.replace(/^\/api\/v1/, '')}`;
 	try {
 		const headers = { ...req.headers };
-		// propagate relevant headers
-		headers['host'] = undefined;
+		// sanitize headers before forwarding
+		delete headers.host;
+		delete headers['content-length'];
+		if (req.body && !headers['content-type']) headers['content-type'] = 'application/json';
 		const resp = await axios({ method: req.method, url, data: req.body, headers, timeout: 5000 });
 		res.status(resp.status).json(resp.data);
 	} catch (err) {
