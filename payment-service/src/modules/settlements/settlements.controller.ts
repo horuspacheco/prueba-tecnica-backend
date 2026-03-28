@@ -1,4 +1,5 @@
-import { Body, Controller, Get, Param, Post, BadRequestException } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, BadRequestException, Req } from '@nestjs/common';
+import type { Request } from 'express';
 import { SettlementsService } from './settlements.service';
 
 class GenerateDto {
@@ -12,7 +13,9 @@ export class SettlementsController {
   constructor(private service: SettlementsService) {}
 
   @Post('generate')
-  async generate(@Body() body: GenerateDto) {
+  async generate(@Req() req: Request, @Body() body: GenerateDto) {
+    console.log('[PaymentService][Settlements] incoming headers:', req.headers);
+    console.log('[PaymentService][Settlements] incoming body:', body);
     const { merchant_id, period_start, period_end } = body || {} as GenerateDto;
     if (!merchant_id) throw new BadRequestException('merchant_id is required');
     if (!period_start || !period_end) throw new BadRequestException('period_start and period_end are required');
