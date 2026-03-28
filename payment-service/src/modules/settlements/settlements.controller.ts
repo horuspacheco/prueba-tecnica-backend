@@ -1,10 +1,19 @@
 import { Body, Controller, Get, Param, Post, BadRequestException, Req } from '@nestjs/common';
 import type { Request } from 'express';
+import { IsISO8601, IsNotEmpty, IsUUID } from 'class-validator';
 import { SettlementsService } from './settlements.service';
 
 class GenerateDto {
+  @IsUUID()
+  @IsNotEmpty()
   merchant_id: string;
+
+  @IsISO8601()
+  @IsNotEmpty()
   period_start: string;
+
+  @IsISO8601()
+  @IsNotEmpty()
   period_end: string;
 }
 

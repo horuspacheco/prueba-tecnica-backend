@@ -81,8 +81,11 @@ async function proxyToPaymentService(req, res) {
 		delete headers.host;
 		delete headers['content-length'];
 		if (req.body && !headers['content-type']) headers['content-type'] = 'application/json';
-		console.log('[Gateway] proxying', req.method, url, 'body present:', !!req.body, 'body:', req.body);
-		const resp = await axios({ method: req.method, url, data: req.body, headers, timeout: 5000 });
+		const hasBody = !!req.body && ['POST','PUT','PATCH','DELETE'].includes(req.method);
+		console.log('[Gateway] proxying', req.method, url, 'body present:', hasBody, 'body:', req.body);
+		const data = hasBody ? JSON.stringify(req.body) : undefined;
+		if (hasBody) headers['content-type'] = 'application/json';
+		const resp = await axios({ method: req.method, url, data, headers, timeout: 5000 });
 		res.status(resp.status).json(resp.data);
 	} catch (err) {
 		if (err.response) {
