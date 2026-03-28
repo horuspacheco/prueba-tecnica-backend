@@ -32,5 +32,13 @@ services:
       PAYMENT_SERVICE_URL: http://payment-service:3001
     depends_on:
       - payment-service
+  notification-service:
+    build: ./notification-service
+    ports:
+      - "3002:3002"
+    environment:
+      DATABASE_URL: postgres://postgres:postgres@postgres:5432/payments
+    depends_on:
+      - postgres
 volumes:
   pgdata:

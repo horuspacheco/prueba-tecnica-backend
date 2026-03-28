@@ -1,2 +1,8 @@
-// Root module for Notification Service (NestJS)
-// ...existing code...
+import { Module } from '@nestjs/common';
+
+@Module({
+	imports: [],
+	controllers: [],
+	providers: [],
+})
+export class AppModule {}

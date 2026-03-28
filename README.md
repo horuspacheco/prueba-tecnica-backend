@@ -15,3 +15,37 @@ Bienvenido/a a la prueba tecnica para la posicion de **Backend Developer**. Esta
 **8 horas** desde el momento en que se comparte este repositorio con el candidato.
 
 Exitos.
+
+## Local setup notes
+
+After cloning your fork you should:
+
+1. Install dependencies for services (from each service folder):
+
+```
+cd payment-service
+npm install
+cd ../api-gateway
+npm install
+cd ../notification-service
+npm install
+```
+
+2. Generate Prisma client and run migrations (payment-service):
+
+```
+cd payment-service
+npx prisma generate
+# If you want to run the initial migration locally:
+npx prisma migrate dev --name init
+```
+
+3. Start with docker-compose or by running services individually.
+
+Run using Docker Compose:
+
+```
+docker-compose up --build
+```
+
+If something fails during build, check each service's `package.json` and ensure dependencies are installed.
