@@ -65,6 +65,7 @@ model Transaction {
   updated_at  DateTime @updatedAt
   merchant    Merchant @relation(fields: [merchant_id], references: [id])
   settlementTransactions SettlementTransaction[]
+  @@index([merchant_id, status, created_at], name: "indexTransactionMerchantStatusDate")
 }
 
 model Settlement {
@@ -78,6 +79,7 @@ model Settlement {
   created_at        DateTime @default(now())
   merchant          Merchant @relation(fields: [merchant_id], references: [id])
   settlementTransactions SettlementTransaction[]
+  @@index([merchant_id, status], name: "indexSettlementMerchantStatus")
 }
 
 model SettlementTransaction {
@@ -89,9 +91,4 @@ model SettlementTransaction {
   @@id([settlement_id, transaction_id])
 }
 
-// Indices para queries frecuentes
-
-// Buscar transacciones por merchant, status, rango de fechas
-indexTransactionMerchantStatusDate on Transaction(merchant_id, status, created_at)
-// Buscar settlements por merchant y status
-indexSettlementMerchantStatus on Settlement(merchant_id, status)
+// Indices definidos dentro de los modelos con @@index
